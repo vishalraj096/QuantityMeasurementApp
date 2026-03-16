@@ -15,6 +15,11 @@ public class QuantityMeasurementApp {
             Feet temp = (Feet) obj;
             return Double.compare(this.value, temp.value) == 0;
         }
+
+        @Override
+        public int hashCode() {
+            return Double.hashCode(value);
+        }
     }
 
     public static void main(String[] args) {
