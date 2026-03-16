@@ -15,6 +15,11 @@ public class QuantityMeasurementApp {
             Feet temp = (Feet) obj;
             return Double.compare(this.value, temp.value) == 0;
         }
+
+        @Override
+        public int hashCode() {
+            return Double.hashCode(value);
+        }
     }
 
     public static class Inch {
@@ -32,6 +37,11 @@ public class QuantityMeasurementApp {
                 return false;
             Inch temp = (Inch) obj;
             return Double.compare(this.value, temp.value) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return Double.hashCode(value);
         }
     }
 
