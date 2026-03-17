@@ -57,8 +57,49 @@ public class QuantityMeasurementApp {
             this(value, LengthUnit.from(unitText));
         }
 
+        public double getValue() {
+            return value;
+        }
+
+        public LengthUnit getUnit() {
+            return unit;
+        }
+
         private double toFeet() {
             return value * unit.getToFeetFactor();
+        }
+
+        public static double convert(double value, LengthUnit sourceUnit, LengthUnit targetUnit) {
+            if (!Double.isFinite(value)) {
+                throw new IllegalArgumentException("Length value must be a finite number");
+            }
+            if (sourceUnit == null) {
+                throw new IllegalArgumentException("Source unit cannot be null");
+            }
+            if (targetUnit == null) {
+                throw new IllegalArgumentException("Target unit cannot be null");
+            }
+
+            double converted = value * sourceUnit.getToFeetFactor() / targetUnit.getToFeetFactor();
+            if (!Double.isFinite(converted)) {
+                throw new IllegalArgumentException("Converted value is out of range");
+            }
+            return converted;
+        }
+
+        public Length convertTo(LengthUnit targetUnit) {
+            double convertedValue = convert(this.value, this.unit, targetUnit);
+            return new Length(convertedValue, targetUnit);
+        }
+
+        public Length convertTo(LengthUnit targetUnit, int decimalPlaces) {
+            if (decimalPlaces < 0) {
+                throw new IllegalArgumentException("Decimal places must be non-negative");
+            }
+            Length converted = convertTo(targetUnit);
+            double scale = Math.pow(10, decimalPlaces);
+            double rounded = Math.round(converted.value * scale) / scale;
+            return new Length(rounded, targetUnit);
         }
 
         @Override
@@ -78,6 +119,36 @@ public class QuantityMeasurementApp {
             double normalizedFeet = Math.round(toFeet() / EPSILON) * EPSILON;
             return Double.hashCode(normalizedFeet);
         }
+
+        @Override
+        public String toString() {
+            return String.format("Length[value=%.6f, unit=%s]", value, unit);
+        }
+    }
+
+    public static boolean demonstrateLengthEquality(Length length1, Length length2) {
+        return length1.equals(length2);
+    }
+
+    public static boolean demonstrateLengthComparison(double value1, LengthUnit unit1, double value2, LengthUnit unit2) {
+        Length length1 = new Length(value1, unit1);
+        Length length2 = new Length(value2, unit2);
+        return demonstrateLengthEquality(length1, length2);
+    }
+
+    public static Length demonstrateLengthConversion(double value, LengthUnit fromUnit, LengthUnit toUnit) {
+        Length source = new Length(value, fromUnit);
+        Length converted = source.convertTo(toUnit);
+        System.out.println("convert(" + value + ", " + fromUnit + ", " + toUnit + ") = " + converted.getValue());
+        return converted;
+    }
+
+    public static Length demonstrateLengthConversion(Length length, LengthUnit toUnit) {
+        Length converted = length.convertTo(toUnit);
+        System.out.println(
+                "convert(" + length.getValue() + ", " + length.getUnit() + ", " + toUnit + ") = "
+                        + converted.getValue());
+        return converted;
     }
 
     public static void demonstrateFeetEquality() {
@@ -131,10 +202,28 @@ public class QuantityMeasurementApp {
         System.out.println("Are 1 cm and 0.393701 inches equal? " + cmVsInch1.equals(cmVsInch2));
     }
 
+    public static void demonstrateUnitToUnitConversion() {
+        demonstrateLengthConversion(1.0, LengthUnit.FEET, LengthUnit.INCHES);
+        demonstrateLengthConversion(3.0, LengthUnit.YARDS, LengthUnit.FEET);
+        demonstrateLengthConversion(36.0, LengthUnit.INCHES, LengthUnit.YARDS);
+        demonstrateLengthConversion(1.0, LengthUnit.CENTIMETERS, LengthUnit.INCHES);
+        demonstrateLengthConversion(0.0, LengthUnit.FEET, LengthUnit.INCHES);
+        demonstrateLengthConversion(-1.0, LengthUnit.FEET, LengthUnit.INCHES);
+
+        Length lengthInYards = new Length(2.0, LengthUnit.YARDS);
+        demonstrateLengthConversion(lengthInYards, LengthUnit.INCHES);
+
+        double roundTrip = Length.convert(Length.convert(Length.convert(5.5, LengthUnit.FEET, LengthUnit.CENTIMETERS), LengthUnit.CENTIMETERS, LengthUnit.YARDS), LengthUnit.YARDS, LengthUnit.FEET);
+        System.out.println("Round-trip 5.5 feet -> cm -> yards -> feet = " + roundTrip);
+
+        System.out.println("Same-unit convert(5.0, FEET, FEET) = " + Length.convert(5.0, LengthUnit.FEET, LengthUnit.FEET));
+    }
+
     public static void main(String[] args) {
         demonstrateFeetEquality();
         demonstrateInchesEquality();
         demonstrateFeetInchesComparison();
         demonstrateExtendedUnitSupport();
+        demonstrateUnitToUnitConversion();
     }
 }
