@@ -102,6 +102,49 @@ public class QuantityMeasurementApp {
             return new Length(rounded, targetUnit);
         }
 
+        public Length add(Length other) {
+            return add(this, other, this.unit);
+        }
+
+        public Length add(Length other, LengthUnit targetUnit) {
+            return add(this, other, targetUnit);
+        }
+
+        public static Length add(Length length1, Length length2) {
+            if (length1 == null) {
+                throw new IllegalArgumentException("First length cannot be null");
+            }
+            return add(length1, length2, length1.unit);
+        }
+
+        public static Length add(Length length1, Length length2, LengthUnit targetUnit) {
+            if (length1 == null) {
+                throw new IllegalArgumentException("First length cannot be null");
+            }
+            if (length2 == null) {
+                throw new IllegalArgumentException("Second length cannot be null");
+            }
+            if (targetUnit == null) {
+                throw new IllegalArgumentException("Target unit cannot be null");
+            }
+
+            double sumInFeet = length1.toFeet() + length2.toFeet();
+            if (!Double.isFinite(sumInFeet)) {
+                throw new IllegalArgumentException("Sum is out of range");
+            }
+
+            double sumInTarget = convert(sumInFeet, LengthUnit.FEET, targetUnit);
+            return new Length(sumInTarget, targetUnit);
+        }
+
+        public static Length add(double value1, LengthUnit unit1, double value2, LengthUnit unit2, LengthUnit targetUnit) {
+            return add(new Length(value1, unit1), new Length(value2, unit2), targetUnit);
+        }
+
+        public static Length add(double value1, LengthUnit unit1, double value2, LengthUnit unit2) {
+            return add(value1, unit1, value2, unit2, unit1);
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {
@@ -145,10 +188,26 @@ public class QuantityMeasurementApp {
 
     public static Length demonstrateLengthConversion(Length length, LengthUnit toUnit) {
         Length converted = length.convertTo(toUnit);
-        System.out.println(
-                "convert(" + length.getValue() + ", " + length.getUnit() + ", " + toUnit + ") = "
-                        + converted.getValue());
+        System.out.println("convert(" + length.getValue() + ", " + length.getUnit() + ", " + toUnit + ") = " + converted.getValue());
         return converted;
+    }
+
+    public static Length demonstrateLengthAddition(Length length1, Length length2) {
+        Length result = length1.add(length2);
+        System.out.println("add(" + length1 + ", " + length2 + ") = " + result);
+        return result;
+    }
+
+    public static Length demonstrateLengthAddition(Length length1, Length length2, LengthUnit targetUnit) {
+        Length result = Length.add(length1, length2, targetUnit);
+        System.out.println("add(" + length1 + ", " + length2 + ", " + targetUnit + ") = " + result);
+        return result;
+    }
+
+    public static Length demonstrateLengthAddition(double value1, LengthUnit unit1, double value2, LengthUnit unit2, LengthUnit targetUnit) {
+        Length result = Length.add(value1, unit1, value2, unit2, targetUnit);
+        System.out.println("add(Quantity(" + value1 + ", " + unit1 + "), Quantity(" + value2 + ", " + unit2 + "), " + targetUnit + ") = " + result);
+        return result;
     }
 
     public static void demonstrateFeetEquality() {
@@ -219,11 +278,31 @@ public class QuantityMeasurementApp {
         System.out.println("Same-unit convert(5.0, FEET, FEET) = " + Length.convert(5.0, LengthUnit.FEET, LengthUnit.FEET));
     }
 
+    public static void demonstrateLengthAdditionOperations() {
+        demonstrateLengthAddition(new Length(1.0, LengthUnit.FEET), new Length(2.0, LengthUnit.FEET));
+        demonstrateLengthAddition(new Length(1.0, LengthUnit.FEET), new Length(12.0, LengthUnit.INCHES));
+        demonstrateLengthAddition(new Length(12.0, LengthUnit.INCHES), new Length(1.0, LengthUnit.FEET));
+        demonstrateLengthAddition(new Length(1.0, LengthUnit.YARDS), new Length(3.0, LengthUnit.FEET));
+        demonstrateLengthAddition(new Length(36.0, LengthUnit.INCHES), new Length(1.0, LengthUnit.YARDS));
+        demonstrateLengthAddition(new Length(2.54, LengthUnit.CENTIMETERS), new Length(1.0, LengthUnit.INCHES));
+        demonstrateLengthAddition(new Length(5.0, LengthUnit.FEET), new Length(0.0, LengthUnit.INCHES));
+        demonstrateLengthAddition(new Length(5.0, LengthUnit.FEET), new Length(-2.0, LengthUnit.FEET));
+
+        demonstrateLengthAddition(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCHES, LengthUnit.INCHES);
+
+        Length a = new Length(1.0, LengthUnit.FEET);
+        Length b = new Length(12.0, LengthUnit.INCHES);
+        Length ab = Length.add(a, b, LengthUnit.FEET);
+        Length ba = Length.add(b, a, LengthUnit.FEET);
+        System.out.println("Commutative check in FEET: " + ab.equals(ba) + " -> " + ab + " and " + ba);
+    }
+
     public static void main(String[] args) {
         demonstrateFeetEquality();
         demonstrateInchesEquality();
         demonstrateFeetInchesComparison();
         demonstrateExtendedUnitSupport();
         demonstrateUnitToUnitConversion();
+        demonstrateLengthAdditionOperations();
     }
 }
