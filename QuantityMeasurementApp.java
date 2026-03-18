@@ -107,7 +107,7 @@ public class QuantityMeasurementApp {
         }
 
         public Length add(Length other, LengthUnit targetUnit) {
-            return add(this, other, targetUnit);
+            return addAndConvert(this, other, targetUnit);
         }
 
         public static Length add(Length length1, Length length2) {
@@ -118,6 +118,10 @@ public class QuantityMeasurementApp {
         }
 
         public static Length add(Length length1, Length length2, LengthUnit targetUnit) {
+            return addAndConvert(length1, length2, targetUnit);
+        }
+
+        private static Length addAndConvert(Length length1, Length length2, LengthUnit targetUnit) {
             if (length1 == null) {
                 throw new IllegalArgumentException("First length cannot be null");
             }
@@ -297,6 +301,29 @@ public class QuantityMeasurementApp {
         System.out.println("Commutative check in FEET: " + ab.equals(ba) + " -> " + ab + " and " + ba);
     }
 
+    public static void demonstrateTargetUnitAddition() {
+        demonstrateLengthAddition(new Length(1.0, LengthUnit.FEET), new Length(12.0, LengthUnit.INCHES), LengthUnit.FEET);
+        demonstrateLengthAddition(new Length(1.0, LengthUnit.FEET), new Length(12.0, LengthUnit.INCHES), LengthUnit.INCHES);
+        Length yardsResult = demonstrateLengthAddition(new Length(1.0, LengthUnit.FEET), new Length(12.0, LengthUnit.INCHES), LengthUnit.YARDS);
+        System.out.println("Rounded yard result (3 decimals): " + yardsResult.convertTo(LengthUnit.YARDS, 3));
+
+        demonstrateLengthAddition(new Length(1.0, LengthUnit.YARDS), new Length(3.0, LengthUnit.FEET), LengthUnit.YARDS);
+        demonstrateLengthAddition(new Length(36.0, LengthUnit.INCHES), new Length(1.0, LengthUnit.YARDS), LengthUnit.FEET);
+        demonstrateLengthAddition(new Length(2.54, LengthUnit.CENTIMETERS), new Length(1.0, LengthUnit.INCHES), LengthUnit.CENTIMETERS);
+        demonstrateLengthAddition(new Length(5.0, LengthUnit.FEET), new Length(0.0, LengthUnit.INCHES), LengthUnit.YARDS);
+        demonstrateLengthAddition(new Length(5.0, LengthUnit.FEET), new Length(-2.0, LengthUnit.FEET), LengthUnit.INCHES);
+
+        Length abYards = Length.add(new Length(1.0, LengthUnit.FEET), new Length(12.0, LengthUnit.INCHES), LengthUnit.YARDS);
+        Length baYards = Length.add(new Length(12.0, LengthUnit.INCHES), new Length(1.0, LengthUnit.FEET), LengthUnit.YARDS);
+        System.out.println("Commutative check in YARDS: " + abYards.equals(baYards) + " -> " + abYards + " and " + baYards);
+
+        try {
+            Length.add(new Length(1.0, LengthUnit.FEET), new Length(12.0, LengthUnit.INCHES), null);
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Null target unit validation: " + ex.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         demonstrateFeetEquality();
         demonstrateInchesEquality();
@@ -304,5 +331,6 @@ public class QuantityMeasurementApp {
         demonstrateExtendedUnitSupport();
         demonstrateUnitToUnitConversion();
         demonstrateLengthAdditionOperations();
+        demonstrateTargetUnitAddition();
     }
 }
