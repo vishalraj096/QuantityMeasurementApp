@@ -1,41 +1,4 @@
 public class QuantityMeasurementApp {
-    public enum LengthUnit {
-        FEET(1.0),
-        INCHES(1.0 / 12.0),
-        YARDS(3.0),
-        CENTIMETERS(0.393701 / 12.0);
-
-        private final double toFeetFactor;
-
-        LengthUnit(double toFeetFactor) {
-            this.toFeetFactor = toFeetFactor;
-        }
-
-        public double getToFeetFactor() {
-            return toFeetFactor;
-        }
-
-        public static LengthUnit from(String unitText) {
-            if (unitText == null) {
-                throw new IllegalArgumentException("Unit cannot be null");
-            }
-            String normalized = unitText.trim().toUpperCase();
-            if (normalized.equals("FOOT") || normalized.equals("FEET")) {
-                return FEET;
-            }
-            if (normalized.equals("INCH") || normalized.equals("INCHES")) {
-                return INCHES;
-            }
-            if (normalized.equals("YARD") || normalized.equals("YARDS") || normalized.equals("YD")) {
-                return YARDS;
-            }
-            if (normalized.equals("CENTIMETER") || normalized.equals("CENTIMETERS") || normalized.equals("CM")) {
-                return CENTIMETERS;
-            }
-            throw new IllegalArgumentException("Unsupported unit: " + unitText);
-        }
-    }
-
     public static class Length {
         private static final double EPSILON = 1e-9;
 
@@ -66,7 +29,7 @@ public class QuantityMeasurementApp {
         }
 
         private double toFeet() {
-            return value * unit.getToFeetFactor();
+            return unit.convertToBaseUnit(value);
         }
 
         public static double convert(double value, LengthUnit sourceUnit, LengthUnit targetUnit) {
@@ -80,10 +43,8 @@ public class QuantityMeasurementApp {
                 throw new IllegalArgumentException("Target unit cannot be null");
             }
 
-            double converted = value * sourceUnit.getToFeetFactor() / targetUnit.getToFeetFactor();
-            if (!Double.isFinite(converted)) {
-                throw new IllegalArgumentException("Converted value is out of range");
-            }
+            double baseValue = sourceUnit.convertToBaseUnit(value);
+            double converted = targetUnit.convertFromBaseUnit(baseValue);
             return converted;
         }
 
@@ -137,7 +98,7 @@ public class QuantityMeasurementApp {
                 throw new IllegalArgumentException("Sum is out of range");
             }
 
-            double sumInTarget = convert(sumInFeet, LengthUnit.FEET, targetUnit);
+            double sumInTarget = targetUnit.convertFromBaseUnit(sumInFeet);
             return new Length(sumInTarget, targetUnit);
         }
 
@@ -324,6 +285,18 @@ public class QuantityMeasurementApp {
         }
     }
 
+    public static void demonstrateStandaloneUnitConversionResponsibility() {
+        System.out.println("LengthUnit.FEET.convertToBaseUnit(12.0) = " + LengthUnit.FEET.convertToBaseUnit(12.0));
+        System.out.println("LengthUnit.INCHES.convertToBaseUnit(12.0) = " + LengthUnit.INCHES.convertToBaseUnit(12.0));
+        System.out.println("LengthUnit.YARDS.convertToBaseUnit(1.0) = " + LengthUnit.YARDS.convertToBaseUnit(1.0));
+        System.out.println("LengthUnit.CENTIMETERS.convertToBaseUnit(30.48) = " + LengthUnit.CENTIMETERS.convertToBaseUnit(30.48));
+
+        System.out.println("LengthUnit.FEET.convertFromBaseUnit(2.0) = " + LengthUnit.FEET.convertFromBaseUnit(2.0));
+        System.out.println("LengthUnit.INCHES.convertFromBaseUnit(1.0) = " + LengthUnit.INCHES.convertFromBaseUnit(1.0));
+        System.out.println("LengthUnit.YARDS.convertFromBaseUnit(3.0) = " + LengthUnit.YARDS.convertFromBaseUnit(3.0));
+        System.out.println("LengthUnit.CENTIMETERS.convertFromBaseUnit(1.0) = " + LengthUnit.CENTIMETERS.convertFromBaseUnit(1.0));
+    }
+
     public static void main(String[] args) {
         demonstrateFeetEquality();
         demonstrateInchesEquality();
@@ -332,5 +305,6 @@ public class QuantityMeasurementApp {
         demonstrateUnitToUnitConversion();
         demonstrateLengthAdditionOperations();
         demonstrateTargetUnitAddition();
+        demonstrateStandaloneUnitConversionResponsibility();
     }
 }
