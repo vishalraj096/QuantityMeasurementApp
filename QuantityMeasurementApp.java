@@ -162,6 +162,88 @@ public class QuantityMeasurementApp {
         System.out.println("LengthUnit.CENTIMETERS.convertFromBaseUnit(1.0) = " + LengthUnit.CENTIMETERS.convertFromBaseUnit(1.0));
     }
 
+    public static boolean demonstrateWeightEquality(Weight weight1, Weight weight2) {
+        return weight1.equals(weight2);
+    }
+
+    public static boolean demonstrateWeightComparison(double value1, WeightUnit unit1, double value2, WeightUnit unit2) {
+        Weight weight1 = new Weight(value1, unit1);
+        Weight weight2 = new Weight(value2, unit2);
+        return demonstrateWeightEquality(weight1, weight2);
+    }
+
+    public static Weight demonstrateWeightConversion(double value, WeightUnit fromUnit, WeightUnit toUnit) {
+        Weight source = new Weight(value, fromUnit);
+        Weight converted = source.convertTo(toUnit);
+        System.out.println("weight.convert(" + value + ", " + fromUnit + ", " + toUnit + ") = " + converted.getValue());
+        return converted;
+    }
+
+    public static Weight demonstrateWeightConversion(Weight weight, WeightUnit toUnit) {
+        Weight converted = weight.convertTo(toUnit);
+        System.out.println("weight.convert(" + weight.getValue() + ", " + weight.getUnit() + ", " + toUnit + ") = " + converted.getValue());
+        return converted;
+    }
+
+    public static Weight demonstrateWeightAddition(Weight weight1, Weight weight2) {
+        Weight result = weight1.add(weight2);
+        System.out.println("weight.add(" + weight1 + ", " + weight2 + ") = " + result);
+        return result;
+    }
+
+    public static Weight demonstrateWeightAddition(Weight weight1, Weight weight2, WeightUnit targetUnit) {
+        Weight result = Weight.add(weight1, weight2, targetUnit);
+        System.out.println("weight.add(" + weight1 + ", " + weight2 + ", " + targetUnit + ") = " + result);
+        return result;
+    }
+
+    public static void demonstrateWeightUnitConversionResponsibility() {
+        System.out.println("WeightUnit.KILOGRAM.convertToBaseUnit(1.0) = " + WeightUnit.KILOGRAM.convertToBaseUnit(1.0));
+        System.out.println("WeightUnit.GRAM.convertToBaseUnit(1000.0) = " + WeightUnit.GRAM.convertToBaseUnit(1000.0));
+        System.out.println("WeightUnit.POUND.convertToBaseUnit(2.20462) = " + WeightUnit.POUND.convertToBaseUnit(2.20462));
+
+        System.out.println("WeightUnit.KILOGRAM.convertFromBaseUnit(1.0) = " + WeightUnit.KILOGRAM.convertFromBaseUnit(1.0));
+        System.out.println("WeightUnit.GRAM.convertFromBaseUnit(1.0) = " + WeightUnit.GRAM.convertFromBaseUnit(1.0));
+        System.out.println("WeightUnit.POUND.convertFromBaseUnit(1.0) = " + WeightUnit.POUND.convertFromBaseUnit(1.0));
+    }
+
+    public static void demonstrateWeightEqualityOperations() {
+        System.out.println("1 kg == 1 kg ? " + demonstrateWeightComparison(1.0, WeightUnit.KILOGRAM, 1.0, WeightUnit.KILOGRAM));
+        System.out.println("1 kg == 1000 g ? " + demonstrateWeightComparison(1.0, WeightUnit.KILOGRAM, 1000.0, WeightUnit.GRAM));
+        System.out.println("2 lb == 2 lb ? " + demonstrateWeightComparison(2.0, WeightUnit.POUND, 2.0, WeightUnit.POUND));
+        double oneKgInPounds = WeightUnit.POUND.convertFromBaseUnit(1.0);
+        System.out.println("1 kg == ~2.20462 lb ? " + demonstrateWeightComparison(1.0, WeightUnit.KILOGRAM, oneKgInPounds, WeightUnit.POUND));
+        System.out.println("500 g == 0.5 kg ? " + demonstrateWeightComparison(500.0, WeightUnit.GRAM, 0.5, WeightUnit.KILOGRAM));
+        System.out.println("1 lb == 453.592 g ? " + demonstrateWeightComparison(1.0, WeightUnit.POUND, 453.592, WeightUnit.GRAM));
+    }
+
+    public static void demonstrateWeightConversionOperations() {
+        demonstrateWeightConversion(1.0, WeightUnit.KILOGRAM, WeightUnit.GRAM);
+        demonstrateWeightConversion(2.0, WeightUnit.POUND, WeightUnit.KILOGRAM);
+        demonstrateWeightConversion(500.0, WeightUnit.GRAM, WeightUnit.POUND);
+        demonstrateWeightConversion(0.0, WeightUnit.KILOGRAM, WeightUnit.GRAM);
+    }
+
+    public static void demonstrateWeightAdditionOperations() {
+        demonstrateWeightAddition(new Weight(1.0, WeightUnit.KILOGRAM), new Weight(2.0, WeightUnit.KILOGRAM));
+        demonstrateWeightAddition(new Weight(1.0, WeightUnit.KILOGRAM), new Weight(1000.0, WeightUnit.GRAM));
+        demonstrateWeightAddition(new Weight(500.0, WeightUnit.GRAM), new Weight(0.5, WeightUnit.KILOGRAM));
+
+        demonstrateWeightAddition(new Weight(1.0, WeightUnit.KILOGRAM), new Weight(1000.0, WeightUnit.GRAM), WeightUnit.GRAM);
+        demonstrateWeightAddition(new Weight(1.0, WeightUnit.POUND), new Weight(453.592, WeightUnit.GRAM), WeightUnit.POUND);
+        demonstrateWeightAddition(new Weight(2.0, WeightUnit.KILOGRAM), new Weight(4.0, WeightUnit.POUND), WeightUnit.KILOGRAM);
+
+        Weight ab = Weight.add(new Weight(1.0, WeightUnit.KILOGRAM), new Weight(1000.0, WeightUnit.GRAM), WeightUnit.POUND);
+        Weight ba = Weight.add(new Weight(1000.0, WeightUnit.GRAM), new Weight(1.0, WeightUnit.KILOGRAM), WeightUnit.POUND);
+        System.out.println("Weight commutative check in POUND: " + ab.equals(ba) + " -> " + ab + " and " + ba);
+    }
+
+    public static void demonstrateCategoryTypeSafety() {
+        Weight oneKg = new Weight(1.0, WeightUnit.KILOGRAM);
+        Object oneFootAsObject = new Length(1.0, LengthUnit.FEET);
+        System.out.println("Weight vs Length equality (must be false): " + oneKg.equals(oneFootAsObject));
+    }
+
     public static void main(String[] args) {
         demonstrateFeetEquality();
         demonstrateInchesEquality();
@@ -171,5 +253,11 @@ public class QuantityMeasurementApp {
         demonstrateLengthAdditionOperations();
         demonstrateTargetUnitAddition();
         demonstrateStandaloneUnitConversionResponsibility();
+
+        demonstrateWeightUnitConversionResponsibility();
+        demonstrateWeightEqualityOperations();
+        demonstrateWeightConversionOperations();
+        demonstrateWeightAdditionOperations();
+        demonstrateCategoryTypeSafety();
     }
 }
