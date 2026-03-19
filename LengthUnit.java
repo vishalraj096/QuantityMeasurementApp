@@ -1,4 +1,4 @@
-public enum LengthUnit {
+public enum LengthUnit implements IMeasurable {
     FEET(1.0),
     INCHES(1.0 / 12.0),
     YARDS(3.0),
@@ -10,10 +10,12 @@ public enum LengthUnit {
         this.toFeetFactor = toFeetFactor;
     }
 
-    public double getToFeetFactor() {
+    @Override
+    public double getConversionFactor() {
         return toFeetFactor;
     }
 
+    @Override
     public double convertToBaseUnit(double value) {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException("Length value must be a finite number");
@@ -25,6 +27,7 @@ public enum LengthUnit {
         return baseValue;
     }
 
+    @Override
     public double convertFromBaseUnit(double baseValue) {
         if (!Double.isFinite(baseValue)) {
             throw new IllegalArgumentException("Length value must be a finite number");
@@ -54,5 +57,10 @@ public enum LengthUnit {
             return CENTIMETERS;
         }
         throw new IllegalArgumentException("Unsupported unit: " + unitText);
+    }
+
+    @Override
+    public String getUnitName() {
+        return name();
     }
 }
