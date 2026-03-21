@@ -52,8 +52,26 @@ public class QuantityMeasurementApp {
         demonstrateAddition(oneKg, thousandGrams);
         demonstrateAddition(oneKg, thousandGrams, WeightUnit.GRAM);
 
+        Quantity<VolumeUnit> oneLitre = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> thousandMillilitres = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
+        Quantity<VolumeUnit> oneGallon = new Quantity<>(1.0, VolumeUnit.GALLON);
+
+        System.out.println("Volume equality (1 litre == 1000 millilitre): " + demonstrateEquality(oneLitre, thousandMillilitres));
+        System.out.println("Volume equality (1 gallon == 3.78541 litre): " + demonstrateEquality(oneGallon, new Quantity<>(3.78541, VolumeUnit.LITRE)));
+
+        demonstrateConversion(oneLitre, VolumeUnit.MILLILITRE);
+        demonstrateConversion(oneGallon, VolumeUnit.LITRE);
+        demonstrateConversion(thousandMillilitres, VolumeUnit.GALLON);
+
+        demonstrateAddition(oneLitre, thousandMillilitres);
+        demonstrateAddition(oneLitre, thousandMillilitres, VolumeUnit.MILLILITRE);
+        demonstrateAddition(oneLitre, oneGallon, VolumeUnit.GALLON);
+
         Quantity<?> lengthAsAny = oneFoot;
         Quantity<?> weightAsAny = oneKg;
+        Quantity<?> volumeAsAny = oneLitre;
         System.out.println("Cross-category equality (length vs weight): " + lengthAsAny.equals(weightAsAny));
+        System.out.println("Cross-category equality (length vs volume): " + lengthAsAny.equals(volumeAsAny));
+        System.out.println("Cross-category equality (weight vs volume): " + weightAsAny.equals(volumeAsAny));
     }
 }
