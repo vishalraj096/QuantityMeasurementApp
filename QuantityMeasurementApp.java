@@ -45,7 +45,7 @@ public class QuantityMeasurementApp {
         }
     }
 
-    public static void feetEquality() {
+    public static void demonstrateFeetEquality() {
         double val1 = 6.4;
         double val2 = 6.4;
 
@@ -58,7 +58,7 @@ public class QuantityMeasurementApp {
             System.out.println("Values are different");
     }
 
-    public static void inchEquality() {
+    public static void demonstrateInchEquality() {
         double val1 = 12.0;
         double val2 = 12.0;
 
@@ -72,7 +72,7 @@ public class QuantityMeasurementApp {
     }
 
     public static void main(String[] args) {
-        feetEquality();
-        inchEquality();
+        demonstrateFeetEquality();
+        demonstrateInchEquality();
     }
 }
