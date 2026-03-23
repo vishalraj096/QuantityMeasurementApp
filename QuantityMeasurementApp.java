@@ -21,6 +21,24 @@ public class QuantityMeasurementApp {
         return result;
     }
 
+    public static <U extends IMeasurable> Quantity<U> demonstrateSubtraction(Quantity<U> quantity1, Quantity<U> quantity2) {
+        Quantity<U> result = quantity1.subtract(quantity2);
+        System.out.println("subtract(" + quantity1 + ", " + quantity2 + ") = " + result);
+        return result;
+    }
+
+    public static <U extends IMeasurable> Quantity<U> demonstrateSubtraction(Quantity<U> quantity1, Quantity<U> quantity2, U targetUnit) {
+        Quantity<U> result = quantity1.subtract(quantity2, targetUnit);
+        System.out.println("subtract(" + quantity1 + ", " + quantity2 + ", " + targetUnit.getUnitName() + ") = " + result);
+        return result;
+    }
+
+    public static <U extends IMeasurable> double demonstrateDivision(Quantity<U> quantity1, Quantity<U> quantity2) {
+        double result = quantity1.divide(quantity2);
+        System.out.println("divide(" + quantity1 + ", " + quantity2 + ") = " + result);
+        return result;
+    }
+
     public static void main(String[] args) {
         Quantity<LengthUnit> oneFoot = new Quantity<>(1.0, LengthUnit.FEET);
         Quantity<LengthUnit> twelveInches = new Quantity<>(12.0, LengthUnit.INCHES);
@@ -38,6 +56,10 @@ public class QuantityMeasurementApp {
         demonstrateAddition(oneFoot, twelveInches);
         demonstrateAddition(oneFoot, twelveInches, LengthUnit.INCHES);
         demonstrateAddition(oneFoot, twelveInches, LengthUnit.YARDS);
+        demonstrateSubtraction(new Quantity<>(10.0, LengthUnit.FEET), new Quantity<>(6.0, LengthUnit.INCHES));
+        demonstrateSubtraction(new Quantity<>(10.0, LengthUnit.FEET), new Quantity<>(6.0, LengthUnit.INCHES), LengthUnit.INCHES);
+        demonstrateSubtraction(new Quantity<>(5.0, LengthUnit.FEET), new Quantity<>(10.0, LengthUnit.FEET));
+        demonstrateDivision(new Quantity<>(24.0, LengthUnit.INCHES), new Quantity<>(2.0, LengthUnit.FEET));
 
         Quantity<WeightUnit> oneKg = new Quantity<>(1.0, WeightUnit.KILOGRAM);
         Quantity<WeightUnit> thousandGrams = new Quantity<>(1000.0, WeightUnit.GRAM);
@@ -51,6 +73,9 @@ public class QuantityMeasurementApp {
 
         demonstrateAddition(oneKg, thousandGrams);
         demonstrateAddition(oneKg, thousandGrams, WeightUnit.GRAM);
+        demonstrateSubtraction(new Quantity<>(10.0, WeightUnit.KILOGRAM), new Quantity<>(5000.0, WeightUnit.GRAM));
+        demonstrateSubtraction(new Quantity<>(2.0, WeightUnit.KILOGRAM), new Quantity<>(5.0, WeightUnit.KILOGRAM));
+        demonstrateDivision(new Quantity<>(2000.0, WeightUnit.GRAM), new Quantity<>(1.0, WeightUnit.KILOGRAM));
 
         Quantity<VolumeUnit> oneLitre = new Quantity<>(1.0, VolumeUnit.LITRE);
         Quantity<VolumeUnit> thousandMillilitres = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
@@ -66,6 +91,10 @@ public class QuantityMeasurementApp {
         demonstrateAddition(oneLitre, thousandMillilitres);
         demonstrateAddition(oneLitre, thousandMillilitres, VolumeUnit.MILLILITRE);
         demonstrateAddition(oneLitre, oneGallon, VolumeUnit.GALLON);
+        demonstrateSubtraction(new Quantity<>(5.0, VolumeUnit.LITRE), new Quantity<>(500.0, VolumeUnit.MILLILITRE));
+        demonstrateSubtraction(new Quantity<>(5.0, VolumeUnit.LITRE), new Quantity<>(2.0, VolumeUnit.LITRE), VolumeUnit.MILLILITRE);
+        demonstrateSubtraction(new Quantity<>(1.0, VolumeUnit.LITRE), new Quantity<>(1000.0, VolumeUnit.MILLILITRE));
+        demonstrateDivision(new Quantity<>(1000.0, VolumeUnit.MILLILITRE), new Quantity<>(1.0, VolumeUnit.LITRE));
 
         Quantity<?> lengthAsAny = oneFoot;
         Quantity<?> weightAsAny = oneKg;

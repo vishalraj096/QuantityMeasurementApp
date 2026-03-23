@@ -57,6 +57,61 @@ public final class Quantity<U extends IMeasurable> {
         return new Quantity<>(sumInTarget, targetUnit);
     }
 
+    public Quantity<U> subtract(Quantity<U> other) {
+        return subtract(other, this.unit);
+    }
+
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+        if (other == null) {
+            throw new IllegalArgumentException("Other quantity cannot be null");
+        }
+        if (targetUnit == null) {
+            throw new IllegalArgumentException("Target unit cannot be null");
+        }
+        validateSameCategory(other);
+
+        double differenceInBase = this.toBaseUnit() - other.toBaseUnit();
+        if (!Double.isFinite(differenceInBase)) {
+            throw new IllegalArgumentException("Difference is out of range");
+        }
+
+        double differenceInTarget = targetUnit.convertFromBaseUnit(differenceInBase);
+        if (!Double.isFinite(differenceInTarget)) {
+            throw new IllegalArgumentException("Difference is out of range");
+        }
+
+        return new Quantity<>(roundToTwoDecimals(differenceInTarget), targetUnit);
+    }
+
+    public double divide(Quantity<U> other) {
+        if (other == null) {
+            throw new IllegalArgumentException("Other quantity cannot be null");
+        }
+        validateSameCategory(other);
+
+        double dividendInBase = this.toBaseUnit();
+        double divisorInBase = other.toBaseUnit();
+        if (Math.abs(divisorInBase) < EPSILON) {
+            throw new ArithmeticException("Cannot divide by zero quantity");
+        }
+
+        double ratio = dividendInBase / divisorInBase;
+        if (!Double.isFinite(ratio)) {
+            throw new IllegalArgumentException("Division result is out of range");
+        }
+        return ratio;
+    }
+
+    private void validateSameCategory(Quantity<U> other) {
+        if (this.unit.getClass() != other.unit.getClass()) {
+            throw new IllegalArgumentException("Quantities belong to different measurement categories");
+        }
+    }
+
+    private static double roundToTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
