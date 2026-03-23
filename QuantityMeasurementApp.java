@@ -102,5 +102,39 @@ public class QuantityMeasurementApp {
         System.out.println("Cross-category equality (length vs weight): " + lengthAsAny.equals(weightAsAny));
         System.out.println("Cross-category equality (length vs volume): " + lengthAsAny.equals(volumeAsAny));
         System.out.println("Cross-category equality (weight vs volume): " + weightAsAny.equals(volumeAsAny));
+
+        Quantity<TemperatureUnit> zeroCelsius = new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+        Quantity<TemperatureUnit> thirtyTwoFahrenheit = new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+        Quantity<TemperatureUnit> kelvin273_15 = new Quantity<>(273.15, TemperatureUnit.KELVIN);
+
+        System.out.println("Temperature equality (0 C == 32 F): " + demonstrateEquality(zeroCelsius, thirtyTwoFahrenheit));
+        System.out.println("Temperature equality (273.15 K == 0 C): " + demonstrateEquality(kelvin273_15, zeroCelsius));
+
+        demonstrateConversion(new Quantity<>(100.0, TemperatureUnit.CELSIUS), TemperatureUnit.FAHRENHEIT);
+        demonstrateConversion(new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT), TemperatureUnit.CELSIUS);
+        demonstrateConversion(new Quantity<>(273.15, TemperatureUnit.KELVIN), TemperatureUnit.CELSIUS);
+
+        try {
+            demonstrateAddition(new Quantity<>(100.0, TemperatureUnit.CELSIUS), new Quantity<>(50.0, TemperatureUnit.CELSIUS));
+        } catch (UnsupportedOperationException ex) {
+            System.out.println("Unsupported operation: " + ex.getMessage());
+        }
+
+        try {
+            demonstrateSubtraction(new Quantity<>(100.0, TemperatureUnit.CELSIUS), new Quantity<>(50.0, TemperatureUnit.CELSIUS));
+        } catch (UnsupportedOperationException ex) {
+            System.out.println("Unsupported operation: " + ex.getMessage());
+        }
+
+        try {
+            demonstrateDivision(new Quantity<>(100.0, TemperatureUnit.CELSIUS), new Quantity<>(50.0, TemperatureUnit.CELSIUS));
+        } catch (UnsupportedOperationException ex) {
+            System.out.println("Unsupported operation: " + ex.getMessage());
+        }
+
+        Quantity<?> temperatureAsAny = zeroCelsius;
+        System.out.println("Cross-category equality (temperature vs length): " + temperatureAsAny.equals(lengthAsAny));
+        System.out.println("Cross-category equality (temperature vs weight): " + temperatureAsAny.equals(weightAsAny));
+        System.out.println("Cross-category equality (temperature vs volume): " + temperatureAsAny.equals(volumeAsAny));
     }
 }

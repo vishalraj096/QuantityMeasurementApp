@@ -41,7 +41,7 @@ public final class Quantity<U extends IMeasurable> {
     }
 
     public Quantity<U> add(Quantity<U> other, U targetUnit) {
-        validateArithmeticOperands(other, targetUnit, true);
+        validateArithmeticOperands(other, targetUnit, true, ArithmeticOperation.ADD);
         double sumInBase = performBaseArithmetic(other, ArithmeticOperation.ADD);
         double sumInTarget = targetUnit.convertFromBaseUnit(sumInBase);
         if (!Double.isFinite(sumInTarget)) {
@@ -55,7 +55,7 @@ public final class Quantity<U extends IMeasurable> {
     }
 
     public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
-        validateArithmeticOperands(other, targetUnit, true);
+        validateArithmeticOperands(other, targetUnit, true, ArithmeticOperation.SUBTRACT);
         double differenceInBase = performBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
         double differenceInTarget = targetUnit.convertFromBaseUnit(differenceInBase);
         if (!Double.isFinite(differenceInTarget)) {
@@ -66,7 +66,7 @@ public final class Quantity<U extends IMeasurable> {
     }
 
     public double divide(Quantity<U> other) {
-        validateArithmeticOperands(other, null, false);
+        validateArithmeticOperands(other, null, false, ArithmeticOperation.DIVIDE);
         return performBaseArithmetic(other, ArithmeticOperation.DIVIDE);
     }
 
@@ -76,7 +76,7 @@ public final class Quantity<U extends IMeasurable> {
         }
     }
 
-    private void validateArithmeticOperands(Quantity<U> other, U targetUnit, boolean targetUnitRequired) {
+    private void validateArithmeticOperands(Quantity<U> other, U targetUnit, boolean targetUnitRequired, ArithmeticOperation operation) {
         if (other == null) {
             throw new IllegalArgumentException("Other quantity cannot be null");
         }
@@ -86,6 +86,12 @@ public final class Quantity<U extends IMeasurable> {
         validateSameCategory(other);
         if (targetUnitRequired && targetUnit == null) {
             throw new IllegalArgumentException("Target unit cannot be null");
+        }
+
+        this.unit.validateOperationSupport(operation.name());
+        other.unit.validateOperationSupport(operation.name());
+        if (targetUnit != null) {
+            targetUnit.validateOperationSupport(operation.name());
         }
     }
 
