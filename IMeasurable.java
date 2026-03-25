@@ -9,6 +9,14 @@ public interface IMeasurable {
 
     String getUnitName();
 
+    default String getMeasurementType() {
+        return getClass().getSimpleName();
+    }
+
+    default IMeasurable getUnitInstance(String unitName) {
+        throw new UnsupportedOperationException("Unit lookup is not implemented for " + getMeasurementType());
+    }
+
     default boolean supportsArithmetic() {
         return DEFAULT_SUPPORTS_ARITHMETIC.isSupported();
     }

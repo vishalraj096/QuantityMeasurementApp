@@ -61,4 +61,14 @@ public enum VolumeUnit implements IMeasurable {
     public String getUnitName() {
         return name();
     }
+
+    @Override
+    public String getMeasurementType() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    public IMeasurable getUnitInstance(String unitName) {
+        return from(unitName);
+    }
 }
